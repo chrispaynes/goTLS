@@ -43,14 +43,16 @@ services:
       tlsserver:latest
     volumes:
       - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg/server:/go/src/server
+      - ${GOPATH}/src/github.com/chrispaynes/goTLS/cert/server.crt:/go/src/server/server.crt
+      - ${GOPATH}/src/github.com/chrispaynes/goTLS/cert/server.key:/go/src/server/server.key
     restart: always
     networks:
       - proxy
     ports:
-      - "3000:3000"
+      - "8443:8443"
     labels:
       - "traefik.backend=server"
       - "traefik.frontend.rule=Host:tls.server.localhost"
       - "traefik.docker.network=proxy"
-      - "traefik.port=3000"
+      - "traefik.port=8443"
 
