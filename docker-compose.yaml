@@ -22,11 +22,10 @@ services:
       context: .
       args:
         - PKG=client
-      dockerfile: ./Docker/Client.Dockerfile
     image:
       tlsclient:latest
     volumes:
-      - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg:${GOPATH}/src/github.com/chrispaynes/goTLS/pkg
+      - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg/client:/go/src/client
     restart: always
     networks:
       - proxy
@@ -40,11 +39,10 @@ services:
       context: .
       args:
         - PKG=server
-      dockerfile: ./Docker/Client.Dockerfile
     image:
       tlsserver:latest
     volumes:
-      - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg:${GOPATH}/src/github.com/chrispaynes/goTLS/pkg
+      - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg/server:/go/src/server
     restart: always
     networks:
       - proxy
