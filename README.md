@@ -9,6 +9,7 @@ Golang HTTPS Client/Server Example
 - [Quickstart](#quickstart)
 - [Architecture](#architecture)
 - [Todo](#todo)
+- [Troubleshooting](#troubleshooting)
 - [See Also](#see-also)
 - [Credits](#credits)
 
@@ -437,8 +438,15 @@ $ openssl x509 -in server.crt -text -noout
 
 ---
 
-### 5. Install The Certificate In The Browser (Optional)
+### 5. Install The Server and Root CA Certificates In The Browser (Optional)
 
+### 6. Start The Client, Server and Traefik Proxy Containers
+```bash
+Docker-Compose Up
+```
+
+### 7. Visit [https://tls.server.localhost:8443](https://tls.server.localhost:8443)
+See the `Hello From The Server` response
 
 ## Architecture
 ```
@@ -456,9 +464,8 @@ $ openssl x509 -in server.crt -text -noout
 │   ├── client
 │   │   └──main.go          -Client Connecting To TLS Server
 │   └── server
-│       ├── main.go         -TLS Server
-│       ├── server.crt
-│       └── server.key
+│       └── main.go         -TLS Server
+
 
 ```
 
@@ -466,6 +473,15 @@ $ openssl x509 -in server.crt -text -noout
 - Create Client Cert
 - Configure Certs/Container to recognize and honor DNS Alt Names outside of the container
 - Document Traefik Hostname Configuration
+
+## Troubleshooting
+```bash
+x509: cannot validate certificate for 000.000.000.000 because it doesn't contain any IP SANs
+```
+- This is not a valid SSL cert because the IP listed in the cert doesn't match the IP the client is trying to connect.
+    - Read the Server Certificate to see that the SANs from the `v3.ext` file match what the client is requesting
+- Connect to the server by Hostname using DNS and adding the hostnames to /etc/hosts
+- Reissue the certs to include an IP SAN for the host's IP
 
 ## See Also
 
