@@ -1,3 +1,4 @@
 ./cert/*root*
 ./cert/*.csr*
 ./cert/v3.ext
+*tmp/

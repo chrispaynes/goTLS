@@ -1,17 +1,17 @@
 FROM golang:1.11.0
 
-ARG PKG
+ARG CMD
 
-ENV PKG "$PKG"
+ENV CMD "$CMD"
 
-WORKDIR /go/src/$PKG
+WORKDIR /go/src/$CMD
 
 ENV GOBIN /go/bin
 
 COPY ./cert/server.crt ./server.crt
 COPY ./cert/server.key ./server.key
 
-COPY ./pkg/$PKG .
+COPY ./cmd/$CMD .
 
 RUN go get \
     && go get github.com/pilu/fresh

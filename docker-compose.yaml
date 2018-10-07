@@ -1,48 +1,58 @@
 version: '3'
 networks:
   proxy:
+    driver: bridge
 services:
   traefik:
       image: traefik
       restart: unless-stopped
-      command: --api --docker
+      command: --web --docker
       networks:
-        - proxy
+        proxy:
+          aliases:
+            - tls.server.localhost
+            - tls.client.localhost
       ports:
         - "80:80"
+        - "443:8443"
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
       labels:
-        - "traefik.backend=traefik"
+        - "traefik.backend=proxy"
         - "traefik.frontend.rule=Host:traefik.localhost"
         - "traefik.port=8080"
+
   tls-client:
     container_name: tls-client
     build:
       context: .
       args:
-        - PKG=client
+        - CMD=client
     image:
       tlsclient:latest
     volumes:
-      - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg/client:/go/src/client
+      - ${GOPATH}/src/github.com/chrispaynes/goTLS/cmd/client:/go/src/client
     restart: always
     networks:
       - proxy
     labels:
       - "traefik.backend=client"
       - "traefik.frontend.rule=Host:tls.client.localhost"
+      - "traefik.frontend.headers.SSLRedirect=true"
+      - "traefik.frontend.entryPoints=https"
+      - "traefik.frontend.redirect.entryPoint=https"
       - "traefik.docker.network=proxy"
+
   tls-server:
     container_name: tls-server
     build:
       context: .
       args:
-        - PKG=server
+        - CMD=server
     image:
       tlsserver:latest
     volumes:
-      - ${GOPATH}/src/github.com/chrispaynes/goTLS/pkg/server:/go/src/server
+      - ${GOPATH}/src/github.com/chrispaynes/goTLS/cmd/server:/go/src/server
       - ${GOPATH}/src/github.com/chrispaynes/goTLS/cert/server.crt:/go/src/server/server.crt
       - ${GOPATH}/src/github.com/chrispaynes/goTLS/cert/server.key:/go/src/server/server.key
     restart: always
@@ -52,7 +62,7 @@ services:
       - "8443:8443"
     labels:
       - "traefik.backend=server"
+      - "traefik.frontend.entryPoints=https"
       - "traefik.frontend.rule=Host:tls.server.localhost"
       - "traefik.docker.network=proxy"
       - "traefik.port=8443"
-

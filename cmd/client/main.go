@@ -17,11 +17,11 @@ func main() {
 	}
 
 	client := &http.Client{Transport: tr}
-	resp, err := client.Get("https://tls.server.localhost")
+	resp, err := client.Get("https://tls.server.localhost:8443")
 
 	if err != nil {
 		log.Println(err)
 	}
 
-	log.Println(resp)
+	log.Println("RESPONSE FROM SECURE SERVER:", resp)
 }
